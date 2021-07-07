@@ -1,0 +1,34 @@
+import json  
+import requests
+import pandas as pd
+left_bottom = [120.008235,30.121327];  # 设置区域左下角坐标（百度坐标系）
+right_top = [120.188758,30.316061]; # 设置区域右上角坐标（百度坐标系）
+part_n = 2;  # 设置区域网格（2*2）
+ 
+url0 = 'http://api.map.baidu.com/place/v2/search?';
+x_item = (right_top[0]-left_bottom[0])/part_n;
+y_item = (right_top[1]-left_bottom[1])/part_n;
+query = '交通设施'; #搜索关键词设置
+ak = 'bwIosNVUTsEURqmM0sDffpB8KcOCbBZF'; #百度地图api信令
+n = 0; # 切片计数器
+feature_data=[]
+for i in range(part_n):
+    for j in range(part_n):
+        left_bottom_part = [left_bottom[0]+i*x_item,left_bottom[1]+j*y_item]; # 切片的左下角坐标
+        right_top_part = [right_top[0]+i*x_item,right_top[1]+j*y_item]; # 切片的右上角坐标
+        for k in range(20):
+            url = url0 + 'query=' + query + '&page_size=20&page_num=' + str(k) + '&scope=1&bounds=' + str(left_bottom_part[1]) + ',' + str(left_bottom_part[0]) + ','+str(right_top_part[1]) + ',' + str(right_top_part[0]) + '&output=json&ak=' + ak;      
+            print(url)
+            data = requests.get(url).text
+            print(data)
+            hjson = json.loads(data);
+            if hjson['message'] == 'ok':
+            	datalist=hjson['results']
+            	for each in datalist:
+            		feature_data.append(each)
+            	# feature=pd.DataFrame(feature_data)
+            # else:break 
+        n += 1;
+        print ('第',str(n),'个切片入库成功')
+with open ('poi.json','w',encoding='utf-8') as f:
+    json.dump(feature_data,f, ensure_ascii=False)
