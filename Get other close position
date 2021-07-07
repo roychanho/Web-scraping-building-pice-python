@@ -1,0 +1,8 @@
+import pandas as pd
+df = pd.read_excel('深圳_商場.xlsx',index_col=0)
+df['y'] = df['x'].map(lambda x:x.split(',')[1])
+df['x'] = df['x'].map(lambda x:x.split(',')[0])
+writer = pd.ExcelWriter('深圳_商場.xlsx')
+df.to_excel(writer,sheet_name='商場')
+writer.save()
+df
