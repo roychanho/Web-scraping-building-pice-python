@@ -1,0 +1,11 @@
+data_html = pd . DataFrame ( columns = [ 'content' ] )
+
+for indexs in data . index : 
+    data_html . loc [ indexs , 'content' ]  =  '{'  + \
+  '"lat":'  +  str ( data . loc [ indexs , '緯度' ] )  +  ','  +   \
+  ' "lng":'  +  str ( data . loc [ indexs , '經度' ] )  +  ',' +   \
+ '"quyu":'  +  '"'  +  str ( data . loc [ indexs , '圈定區域' ] )  + '"'  +    \
+  '}'  +  ','
+
+data_html . to_excel  ( "data_html.xlsx" , encoding = "gbk" )
+data_html
