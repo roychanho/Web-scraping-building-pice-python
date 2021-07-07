@@ -1,0 +1,33 @@
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+import re
+from pandas import Series, DataFrame
+session = requests.session()
+# User-Agent
+headers ={"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.100 Safari/537.36",
+"accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,/;q=0.8,application/signed-exchange;v=b3;q=0.9"}
+all_results=[]
+pages = range(1,2)
+abc = [*pages]
+for page in abc:
+    url =("https://sz.centanet.com/xiaoqu/g" + str(page))
+    req =session.get(url,headers=headers)
+    soup = BeautifulSoup(req.content,'html.parser')
+    table = soup.body
+    table_rows = table.find_all('div',class_ = ["item-info fl"])
+    for tr in table_rows:
+        td = tr.find_all(['a','p'])
+        data = [i.text for i in td]
+        data2 = [elem.strip() for elem in data]
+        data2[1]= data2[1].replace("  ", "").replace("\r\n","").replace(",","")
+        data2[5]= data2[5].replace("建造年代：","").replace("\r\n","").replace("年","")
+        data99= re.findall(r"\d+\.?\d*",data2[7])
+        data2[7]= str('\n'.join(data99[1:])).strip('[]') 
+        del data2[4]
+        del data2[5]
+        all_results.append(data2)
+        df = DataFrame(all_results,columns=['房子名稱','地址','district','小區','建造年份','距離地鐵'])
+        df.to_csv("小區.csv",encoding='utf_8_sig')
+df        
+        
